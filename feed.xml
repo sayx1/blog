@@ -2,9 +2,9 @@
 
 <feed xmlns="http://www.w3.org/2005/Atom">
   <id>https://sureshpantha.com.np/</id>
-  <title>Seku Blog</title>
-  <subtitle>A minimal, responsive and feature-rich Jekyll theme for technical writing.</subtitle>
-  <updated>2025-05-29T10:42:57+05:45</updated>
+  <title>Seku's Blog</title>
+  <subtitle>Chronicles of a Product Security Engineer, Follow me as I learn and explore product security. Sharing what I'm figuring out, the lessons learned, and the many mistakes I make along the way.</subtitle>
+  <updated>2025-05-29T12:12:59+05:45</updated>
   <author>
     <name>sayx1</name>
     <uri>https://sureshpantha.com.np/</uri>
@@ -24,7 +24,7 @@
     <link href="https://sureshpantha.com.np/posts/Threat-Modeling-Browser-s-Storage/" rel="alternate" type="text/html" title="Threat Modeling Browser’s Storage" />
     <published>2025-05-29T00:00:00+05:45</published>
   
-    <updated>2025-05-29T00:00:00+05:45</updated>
+    <updated>2025-05-29T11:46:58+05:45</updated>
   
     <id>https://sureshpantha.com.np/posts/Threat-Modeling-Browser-s-Storage/</id>
     <content type="text/html" src="https://sureshpantha.com.np/posts/Threat-Modeling-Browser-s-Storage/" />
@@ -34,7 +34,9 @@
 
   
     
-    <category term="WEB" />
+    <category term="Security" />
+    
+    <category term="Web" />
     
   
 

@@ -1,9 +1,9 @@
 
 
 {
-  "name": "Seku Blog",
-  "short_name": "Seku Blog",
-  "description": "A minimal, responsive and feature-rich Jekyll theme for technical writing.",
+  "name": "Seku's Blog",
+  "short_name": "Seku's Blog",
+  "description": "Chronicles of a Product Security Engineer, Follow me as I learn and explore product security. Sharing what I'm figuring out, the lessons learned, and the many mistakes I make along the way.",
   "icons": [
     {
       "src": "/assets/img/favicons/android-chrome-192x192.png",
