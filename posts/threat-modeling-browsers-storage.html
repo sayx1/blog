@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Threat Modeling Browser’s Storage">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Threat Modeling Browser’s Storage — seku's blog">
+<meta property="og:description" content="Threat Modeling Browser’s Storage">
+<meta property="og:url" content="https://sureshpantha.com.np/posts/threat-modeling-browsers-storage.html">
+<meta property="og:site_name" content="seku's blog">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://sureshpantha.com.np/posts/threat-modeling-browsers-storage.html">
+<link rel="alternate" type="application/rss+xml" title="seku's blog" href="https://sureshpantha.com.np/feed.xml">
+<title>Threat Modeling Browser’s Storage — seku's blog</title>
+<script>
+(function(){
+  var s=localStorage.getItem('theme');
+  if(s) document.documentElement.setAttribute('data-theme',s);
+})();
+</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --bg: #fff;
+  --fg: #1a1a1a;
+  --muted: #666;
+  --border: #e0e0e0;
+  --link: #1a1a1a;
+  --link-hover: #555;
+  --code-bg: #f4f4f4;
+  --max-w: min(760px, 92vw);
+}
+
+[data-theme="dark"] {
+    --bg: #111;
+    --fg: #e8e8e8;
+    --muted: #888;
+    --border: #2a2a2a;
+    --link: #e8e8e8;
+    --link-hover: #aaa;
+    --code-bg: #1e1e1e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111;
+    --fg: #e8e8e8;
+    --muted: #888;
+    --border: #2a2a2a;
+    --link: #e8e8e8;
+    --link-hover: #aaa;
+    --code-bg: #1e1e1e;
+  }
+}
+
+html { font-size: 18px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-serif, Georgia, "Times New Roman", serif;
+  line-height: 1.7;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+
+main { max-width: var(--max-w); margin: 0 auto; overflow-wrap: break-word; }
+
+article p, article li {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
+/* Justified text creates uneven gaps and ugly hyphen breaks in a narrow
+   column; fall back to ragged-right on phones and small tablets. */
+@media (max-width: 768px) {
+  article p, article li { text-align: left; hyphens: none; }
+}
+
+:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+header {
+  margin-bottom: 3rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+}
+header h1 { margin: 0 0 0.25rem; font-size: 1.4rem; }
+header h1 a { text-decoration: none; color: var(--fg); }
+header p { margin: 0; color: var(--muted); font-size: 0.88rem; font-family: ui-sans-serif, system-ui, sans-serif; }
+
+.header-row { display: flex; justify-content: space-between; align-items: flex-start; }
+
+nav { margin-top: 0.75rem; font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.88rem; }
+nav a { color: var(--muted); text-decoration: none; margin-right: 1.2rem; }
+nav a:hover { color: var(--fg); }
+
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  padding: 0.2rem 0.6rem;
+  margin-top: 0.1rem;
+  line-height: 1.4;
+}
+.theme-toggle:hover { color: var(--fg); border-color: var(--fg); }
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.3;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  scroll-margin-top: 1.5rem;
+  text-wrap: balance;
+}
+h1 { font-size: 1.6rem; }
+h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.25rem; }
+h3 { font-size: 1.05rem; }
+h4 { font-size: 0.95rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; font-family: ui-sans-serif, system-ui, sans-serif; }
+h5, h6 { font-size: 0.9rem; font-style: italic; font-weight: 600; }
+
+a { color: var(--link); }
+a:hover { color: var(--link-hover); }
+p { margin: 1rem 0; }
+
+figure { margin: 1.5rem 0; text-align: center; }
+figure img { display: block; margin: 0 auto; background: #fff; padding: 0.5rem; border-radius: 6px; }
+figcaption { margin-top: 0.4rem; font-size: 0.8rem; color: var(--muted); font-family: ui-sans-serif, system-ui, sans-serif; font-style: italic; }
+
+code {
+  background: var(--code-bg);
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+  font-size: 0.88em;
+  font-family: ui-monospace, monospace;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1rem;
+  overflow-x: auto;
+  border-radius: 4px;
+  font-size: 0.85em;
+  line-height: 1.5;
+}
+pre code { background: none; padding: 0; }
+
+blockquote {
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--border);
+  color: var(--muted);
+  font-style: italic;
+}
+
+img { max-width: 100%; height: auto; border-radius: 4px; }
+hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+.table-wrap { overflow-x: auto; max-width: 100%; margin: 1.5rem 0; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { border: 1px solid var(--border); padding: 0.5rem 0.75rem; text-align: left; }
+th { background: var(--code-bg); }
+
+.post-list { list-style: none; padding: 0; margin: 0; }
+.post-list li { padding: 0.75rem 0; border-bottom: 1px solid var(--border); }
+.post-list li:last-child { border-bottom: none; }
+.post-list-row { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.post-list a { text-decoration: none; font-size: 1rem; }
+.post-list a:hover { text-decoration: underline; }
+.post-date { color: var(--muted); font-size: 0.82rem; font-family: ui-sans-serif, system-ui, sans-serif; white-space: nowrap; }
+.post-desc { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.85rem; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.35rem; }
+.tag {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+}
+.tag:hover { color: var(--fg); }
+
+.tag-list { list-style: none; padding: 0; margin: 0; }
+.tag-list li { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-family: ui-sans-serif, system-ui, sans-serif; }
+.tag-list li:last-child { border-bottom: none; }
+.tag-count { color: var(--muted); font-size: 0.85rem; }
+
+.post-header { margin-bottom: 2rem; }
+.post-header h1 { margin-top: 0; margin-bottom: 0.5rem; }
+.post-meta { color: var(--muted); font-size: 0.85rem; font-family: ui-sans-serif, system-ui, sans-serif; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+
+.toc {
+  background: var(--code-bg);
+  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  margin: 2rem 0;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.88rem;
+}
+.toc::before { content: "Contents"; font-weight: 600; display: block; margin-bottom: 0.5rem; }
+.toc ul { margin: 0; padding-left: 1.25rem; }
+.toc li { margin: 0.2rem 0; }
+.toc a { color: var(--muted); text-decoration: none; }
+.toc a:hover { color: var(--fg); }
+
+footer {
+  margin-top: 4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+@media print {
+  :root, [data-theme="dark"] {
+    --bg: #fff; --fg: #000; --muted: #444; --border: #ccc; --code-bg: #f4f4f4;
+  }
+  body { padding: 0; font-size: 11pt; }
+  nav, .theme-toggle, footer, .toc { display: none; }
+  a { text-decoration: none; }
+  pre, blockquote, figure, tr { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="header-row">
+    <div>
+      <h1><a href="../index.html">seku's blog</a></h1>
+      <p>Chronicles of a Product Security Engineer</p>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">◑</button>
+  </div>
+  <nav>
+    <a href="../index.html">posts</a>
+    <a href="../tags/index.html">tags</a>
+    <a href="../about.html">about</a>
+  </nav>
+</header>
+<article>
+<div class="post-header">
+  <h1>Threat Modeling Browser’s Storage</h1>
+  <div class="post-meta">
+    <span>Jun 12, 2026 &middot; seku &middot; 13 min read</span>
+    <div class="tags"><a class="tag" href="../tags/security.html">#security</a><a class="tag" href="../tags/browser.html">#browser</a><a class="tag" href="../tags/web.html">#web</a></div>
+  </div>
+</div>
+<nav class="toc"><ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#access-to-client-side-storage">Access to Client-Side Storage</a></li>
+<li><a href="#client-side-storage">Client-Side Storage</a><ul>
+<li><a href="#cookies">Cookies</a><ul>
+<li><a href="#who-can-access-cookies-associated-with-a-domain">Who can access cookies associated with a domain?</a><ul>
+<li><a href="#same-origin-access">Same-Origin Access</a></li>
+<li><a href="#browser-access">Browser Access</a></li>
+<li><a href="#server-side-access">Server-Side Access</a></li>
+</ul>
+</li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+</ul>
+</li>
+<li><a href="#web-storage-api">Web Storage API</a><ul>
+<li><a href="#local-storage">Local Storage</a></li>
+<li><a href="#who-can-access-local-storage-associated-with-a-domain">Who can access Local Storage associated with a domain?</a><ul>
+<li><a href="#same-origin-access_1">Same-Origin Access</a></li>
+<li><a href="#browser-access_1">Browser Access</a></li>
+<li><a href="#server-side-access_1">Server-Side Access</a></li>
+<li><a href="#session-storage">Session Storage</a></li>
+<li><a href="#who-can-access-localstorage-associated-with-a-domain">Who can access localStorage associated with a domain?</a><ul>
+<li><a href="#same-origin-access_2">Same-Origin Access</a></li>
+<li><a href="#browser-access_2">Browser Access</a></li>
+<li><a href="#server-side-access_2">Server-Side Access</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#security-considerations_1">Security Considerations</a></li>
+</ul>
+</li>
+<li><a href="#key-difference-between-cookies-localsession-storage-in-terms-of-security">Key Difference between Cookies &amp; local/session Storage in terms of Security</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul></nav>
+<h2 id="introduction">Introduction</h2>
+<p>In the early days of the World Wide Web, websites were primarily static. The server responded with the same static file (say <code>home.html</code> for the home page) without any user-specific personalization on every request. Every visitor to any web application receives identical content from the server. As web applications evolved, the need to have personalized content tailored to each user became a necessity. Websites needed to store data and generate customized content in real time based on user interaction, specific requests, and/or backend processes. This required the servers to store user information and verify the user's identity when serving the requests. As HTTP is a stateless protocol, web applications require a way to store user-identifying information on the client side, which could be sent with every request. <a href="https://hiddenheroes.netguru.com/lou-montulli">Thus, the cookie was born</a>. </p>
+<p>The predominant architecture that emerged from all this involves server-side storage of user data, with browsers maintaining session information to identify logged-in users and facilitate personalized content delivery. </p>
+<p><figure><img alt="Pa" src="../img/pa.png" /><figcaption>Pa</figcaption></figure></p>
+<p>Web applications have become integral to our lives as the internet has grown. Everything is moving to the web, and web applications are becoming sophisticated and feature-rich. The data the server needs to send on each request is growing exponentially. If data is only stored on the server and transmitted on each request, the load times for each website would be very high. Storing some of the information from previous requests on the client end significantly increases the response times, removes the burden on the server to serve huge amounts of data in each request, and allows the javascript running on the browser to give unique user experiences. 
+Today, web applications store significant information on the client side in the browsers.</p>
+<p><figure><img alt="Pa user" src="../img/pa_user.png" /><figcaption>Pa user</figcaption></figure>
+As more websites are being built to store significant data on the client side, it is becoming a prime target for attackers. As there are multiple ways of storing this data on the browser, each coming with its own advantages and disadvantages, it becomes essential for development teams to learn about the risks associated with each form of storage and ensure safeguards are in place to address the issue.</p>
+<h2 id="access-to-client-side-storage">Access to Client-Side Storage</h2>
+<p>Like any other program in your operating system, browsers run as a process. When it's running, this process gets its own set of memory. In multithreaded systems, this process can spawn o
+processes, which are child-to-parent processes. In most modern browsers, a site is run as an isolated child process that has only access to its data in the memory.  A process can write to disk and fetch from it. Most modern operating systems have discretionary access control, meaning access to data is based on the user's identity. This means that anything stored on the client side by any web application is stored within files that high-privileged users can access, say, Administrators and root users (and malware that has gained permission from said high-privileged users). For example, Mozilla stores all of its cookies inside a file called cookies.sqlite, which resides within <a href="https://stackoverflow.com/questions/7610896/how-do-i-use-sqlite-to-read-data-from-the-firefox-cookies-file">Mozilla's profile directory</a>. It takes a simple SQLite3 reader to parse the file and <a href="https://www.blackhillsinfosec.com/your-browser-is-not-a-safe-space/">extract sensitive information</a>.</p>
+<p>The Same-origin Policy governs access to client-side information for the sites rendered in a browser. A document's origin is a unique identifier that combines protocol (https://), domain (<a href="http://example.com/">example.com</a>), and port number (443). </p>
+<p>The same-origin policy states <a href="https://en.wikipedia.org/wiki/Same-origin_policy">that a web browser permits scripts contained in a first web page to access data on a second web page, but only if both web pages have the same <em>origin</em></a>. </p>
+<p>Two URLs have the <em>same origin</em> if the
+- <a href="https://developer.mozilla.org/en-US/docs/Glossary/Protocol">protocol</a>, 
+- <a href="https://developer.mozilla.org/en-US/docs/Glossary/Port">port</a> (if specified), and 
+- <a href="https://developer.mozilla.org/en-US/docs/Glossary/Host">Host</a> is the same for both URLs.  </p>
+<p>Websites with the same scheme, hostname, and port combination are considered "same-origin."</p>
+<p>Here's a table illustrating Same-Origin Policy scenarios using <strong><em>sureshpantha.com.np</em></strong> as the base origin:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Origin</th>
+<th>Same/Different</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://sureshpantha.com.np">https://sureshpantha.com.np</a></td>
+<td>Same Origin</td>
+<td>Identical protocol, hostname, port</td>
+</tr>
+<tr>
+<td><a href="http://sureshpantha.com.np">http://sureshpantha.com.np</a></td>
+<td>Different Origin</td>
+<td>Different protocol (http vs https)</td>
+</tr>
+<tr>
+<td><a href="https://www.sureshpantha.com.np">https://www.sureshpantha.com.np</a></td>
+<td>Different Origin</td>
+<td>Different subdomain</td>
+</tr>
+<tr>
+<td><a href="https://sureshpantha.com.np:8080">https://sureshpantha.com.np:8080</a></td>
+<td>Different Origin</td>
+<td>Different port</td>
+</tr>
+<tr>
+<td><a href="https://example.com">https://example.com</a></td>
+<td>Different Origin</td>
+<td>Different hostname</td>
+</tr>
+<tr>
+<td><a href="https://sureshpantha.com.np/page">https://sureshpantha.com.np/page</a></td>
+<td>Same Origin</td>
+<td>Path doesn't affect origin</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="client-side-storage">Client-Side Storage</h2>
+<p>Browsers store information about users, sessions, or site preferences directly on the client device, which is client-side storage. By storing data on the client side, developers can significantly reduce load times and make websites more responsive and reliable. Storing sensitive data on the client side opens it up to attacks and can lead to significant exposure. Understanding how data is stored and accessed helps web developers decide where to store data safely.</p>
+<p>In modern web applications, we can store data in the client's browser in one of the following ways:
+- <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies"><strong>Cookies</strong></a>
+- <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API"><strong>Web Storage API</strong></a>
+    - <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage"><strong>Local Storage</strong></a>
+    - <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage"><strong>Session Storage</strong></a></p>
+<h3 id="cookies">Cookies</h3>
+<p>HTTP cookies are data stored in the client’s device, which enables websites to track sessions, remember user preferences, and personalize web experiences. A cookie is transmitted through the <code>Cookie</code> Header after being set by the server using the <code>Set-Cookie</code> response header. </p>
+<p><figure><img alt="Cookie" src="../img/cookie.png" /><figcaption>Cookie</figcaption></figure></p>
+<p>Along with the key-value pair, the server can set an expiry date after which the cookie expires. If no date is set, session cookies (without an expiration date) expire when the browser is closed. Persistent cookies without an explicit expiry date typically default to not being set, which means they won't be automatically stored or transmitted after the current browsing session ends.
+The cookies set for a site are sent to the server for every subsequent request. </p>
+<p><figure><img alt="Cookie send" src="../img/cookie-send.png" /><figcaption>Cookie send</figcaption></figure></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><strong>Attribute</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Use Case</strong></td>
+<td>Small Pieces of information about user preferences, user tracking, session management, and remembering stateful information</td>
+</tr>
+<tr>
+<td><strong>Expiration</strong></td>
+<td>Session-based (deleted when session is closed ), can be made persistent by setting up expiry date</td>
+</tr>
+<tr>
+<td><strong>Data Capacity</strong></td>
+<td>4 KB per cookie. Each browser has a threshold for <a href="http://browsercookielimits.iain.guru/">how many cookies are allowed per site</a>.</td>
+</tr>
+<tr>
+<td><strong>Constraints</strong></td>
+<td>- Cookies are sent with every request to the server<br>- Access to cookies are subject to security policies and same-origin restrictions</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="who-can-access-cookies-associated-with-a-domain">Who can access cookies associated with a domain?</h4>
+<p>In terms of access to the data stored inside the cookies,</p>
+<h5 id="same-origin-access">Same-Origin Access</h5>
+<p>A cookie set by <code>example.com</code> can be accessed by any JavaScript running on any page from the same origin by default. We can also explicitly specify which subpages have access to the cookie using the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#define_where_cookies_are_sent">Path attribute</a>. </p>
+<blockquote>
+<p>The <code>Path</code> attribute indicates a URL path that must exist in the requested URL in order to send the <code>Cookie</code> header.</p>
+</blockquote>
+<p>Cookies can be accessed by subdomains if the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#define_where_cookies_are_sent">Domain attribute</a> is set while the cookie is being set.</p>
+<blockquote>
+<p>The <code>Domain</code> attribute specifies which server can receive a cookie. If specified, cookies are available on the specified server and its subdomains. For example, if you set <code>Domain=mozilla.org</code> from <code>mozilla.org</code>, cookies are available on that domain and subdomains like <code>developer.mozilla.org</code>.</p>
+</blockquote>
+<p>Access to cookie data by Javascript can be completely <a href="https://portswigger.net/web-security/csrf/bypassing-samesite-restrictions">almost</a> restricted by using the <code>HttpOnly</code> flag. This ensures that the cookie is safe from XXS vulnerabilities present in the page.</p>
+<blockquote>
+<p>A cookie with the <code>HttpOnly</code> attribute can't be accessed by JavaScript, for example using <a href="https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie"><code>Document.cookie</code></a>; it can only be accessed when it reaches the server. Cookies that persist user sessions for example should have the <code>HttpOnly</code> attribute set — it would be really insecure to make them available to JavaScript. This precaution helps mitigate cross-site scripting (<a href="https://developer.mozilla.org/en-US/docs/Web/Security/Types_of_attacks#cross-site_scripting_xss">XSS</a>) attacks.</p>
+</blockquote>
+<h5 id="browser-access">Browser Access</h5>
+<ul>
+<li>Users can view and delete cookies through browser settings/dev tools.</li>
+<li>Browser extensions with appropriate permissions can access cookies.</li>
+<li>The browser itself manages and enforces cookie access controls.</li>
+</ul>
+<h5 id="server-side-access">Server-Side Access</h5>
+<ul>
+<li>The web server of the domain that sets the cookie receives cookies in HTTP requests</li>
+<li>Back-end services of that domain can process cookie data</li>
+<li>Load balancers/proxies in front of the server may also see cookies</li>
+</ul>
+<h4 id="security-considerations">Security Considerations</h4>
+<ul>
+<li>Cookies are protected using the same origin policy, where data stored is scoped to the document’s origin, meaning the webpage can only access data if it has the same origin by default.</li>
+<li>This means that if an attacker can inject JavaScript into a webpage (XSS), that attacker-controlled JavaScript can access all stored cookies in the client’s browser.</li>
+<li>As cookies have to be sent with each request, they can be stolen if an attacker gets access to these requests eg . Load balancers/proxies</li>
+<li>
+<p>Several attributes have been introduced which can be sent with the Set-Cookie header to ensure the browser handles cookies in a certain way;</p>
+<ul>
+<li>
+<p><code>Secure</code> attribute instructs the browser to only send the cookie over encrypted HTTPS connections.</p>
+</li>
+<li>
+<p>Cookies with <code>HTTPOnly</code> attribute are not accessible from Javascript and, therefore, unaffected by cross-site scripting (XSS) attacks.</p>
+</li>
+<li>
+<p>Cookies' <code>Path</code> and <code>Domain</code> attributes precisely control cookie accessibility across web applications. </p>
+<ul>
+<li>
+<p>The <code>Path</code> attribute restricts a cookie to specific server routes—for instance, setting <code>Path=/admin</code> ensures a cookie is only accessible within administrative sections, preventing other application segments from reading it. </p>
+</li>
+<li>
+<p>Similarly, the <code>Domain</code> attribute allows cookie sharing across subdomains; using <code>Domain=.example.com</code> enables a single cookie to be valid for <code>blog.example.com</code>, <code>store.example.com</code>, and <code>www.example.com</code>, facilitating unified authentication and tracking across different service endpoints while maintaining security boundaries.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>The SameSite cookie attribute controls how cookies are handled in cross-site requests, helping protect against Cross-Site Request Forgery (CSRF) attacks. It offers three settings: </p>
+<ul>
+<li>Strict (most secure, only sends cookies in first-party context), </li>
+<li>Lax (default, allows cookies in top-level navigations), and </li>
+<li>None (allows cross-site cookie transmission, requires Secure flag).</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="web-storage-api"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API">Web Storage API</a></h3>
+<p>Web storage API provides a mechanism to store key-value pairs in the browser. It is generally divided into Local Storage and Session Storage.</p>
+<h5 id="local-storage"><strong>Local Storage</strong></h5>
+<p>Local storage is a feature in web browsers that lets web developers save data in users' browsers. It is part of the Web Storage API along with Session Storage. When users request a webpage, the server sends data and the Javascript code to save in the browser — local Storage stores data as key-value pairs. Data saved through local storage persists on the browser when the page is closed or refreshed. Data in localStorage is saved using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage/setItem">localStorage.setItem()</a> method.
+<figure><img alt="Localset" src="../img/localset.png" /><figcaption>Localset</figcaption></figure>
+The stored data can be retrieved by the javascript running on the browser with it's key by using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage/getItem">localStorage.getItem("key")</a></p>
+<p><figure><img alt="Localget" src="../img/localget.png" /><figcaption>Localget</figcaption></figure>Once stored in Local Storage, data must be cleared explicitly ( using methods like <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage/removeItem">removeItem()</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage/clear">clear()</a> ); i.e., it remains unless explicitly cleared. Data stored in Local Storage is scoped to the document's origin.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><strong>Attribute</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Use Case</strong></td>
+<td>Storing larger amounts of data client-side, web app configurations, non-sensitive user preferences, offline data, cached assets</td>
+</tr>
+<tr>
+<td><strong>Expiration</strong></td>
+<td>Persistent until explicitly cleared by code or user. Survives browser restarts and OS reboots</td>
+</tr>
+<tr>
+<td><strong>Data Capacity</strong></td>
+<td>~ 5-10 MB (varies by browser). Significantly larger than cookies</td>
+</tr>
+<tr>
+<td><strong>Constraints</strong></td>
+<td>- JavaScript access only (no server access)<br>- Same-origin policy applies<br>- Synchronous operations can block main thread</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="who-can-access-local-storage-associated-with-a-domain">Who can access Local Storage associated with a domain?</h4>
+<h5 id="same-origin-access_1">Same-Origin Access</h5>
+<p>Similar to the cookie, access to localStorage is governed by the Same-Origin Policy. Data stored in the Local Storage is shared between all tabs and windows from the same origin. There are no attributes that can restrict access to data stored in localStorage.  </p>
+<h5 id="browser-access_1">Browser Access</h5>
+<ul>
+<li>Users can view and clear localStorage data through browser developer tools or settings</li>
+<li>Browser extensions with appropriate permissions can read/modify localStorage content</li>
+<li>The browser will control access to localStorage by an application using the same-origin policy, so data is accessible only for scripts from the same domain that created it.</li>
+<li>Unlike cookies, localStorage data persists indefinitely until explicitly cleared by the user or application.</li>
+<li>The browser enforces a storage limit (usually around 5-10 MB) for localStorage per domain.</li>
+</ul>
+<h5 id="server-side-access_1">Server-Side Access</h5>
+<ul>
+<li>The web server and backend services cannot directly access localStorage data since it remains client-side only.</li>
+<li>localStorage data is not automatically sent with HTTP requests like cookies are.</li>
+<li>You need to share data in localStorage with the server: You need to consciously read it using JavaScript and send it using AJAX/fetch requests or form submissions.</li>
+<li>Load balancers and proxies never see localStorage data because it remains within the browser.</li>
+</ul>
+<h5 id="session-storage"><strong>Session Storage</strong></h5>
+<p><code>sessionStorage</code> is similar to <code>localStorage</code>, but stores data only needed for the current session. The data is cleared when the user navigates away from the page, or the browser is closed.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><strong>Attribute</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Use Case</strong></td>
+<td>Temporary data storage during a single page session, form data backup, per-tab state management, temporary user preferences</td>
+</tr>
+<tr>
+<td><strong>Expiration</strong></td>
+<td>Data persists only for the duration of the page session. Cleared when tab/window is closed</td>
+</tr>
+<tr>
+<td><strong>Data Capacity</strong></td>
+<td>~5-10 MB (varies by browser). Similar to localStorage</td>
+</tr>
+<tr>
+<td><strong>Constraints</strong></td>
+<td>- JavaScript access only (no server access)<br>- Same-origin policy applies<br>- Limited to single browser tab/window which created the session storage<br>- Synchronous operations</td>
+</tr>
+</tbody>
+</table></div>
+<h5 id="who-can-access-localstorage-associated-with-a-domain">Who can access localStorage associated with a domain?</h5>
+<h6 id="same-origin-access_2">Same-Origin Access</h6>
+<p>Similar to localStorage, access to localStorage is governed by the Same-Origin Policy. Unlike localStorage, data stored in sessionStorage is not shared between all tabs and windows from the same origin. It is only accessible within the same tab/window that created it. Each tab/window gets its own separate sessionStorage instance, even from the same origin.</p>
+<h6 id="browser-access_2">Browser Access</h6>
+<p>In terms of Browser Access, access to sessionStorage is similar to that of localStorage except for two distinct differences, 
+- Unlike localStorage, sessionStorage data is cleared automatically when the tab/window is closed.
+- Each browser tab maintains its own separate sessionStorage instance, even for the same domain.</p>
+<h6 id="server-side-access_2">Server-Side Access</h6>
+<p>Server-Side Access of sessionStorage is similar to that of the localStorage.</p>
+<h4 id="security-considerations_1">Security Considerations</h4>
+<ul>
+<li>Same Origin Policy applies for Local Storage and Session Storage. Access to data is protected using the same origin policy, where data stored is scoped to the document’s origin, meaning the webpage can only access data if it has the same origin by default.</li>
+<li>Local Storage and Session Storage is accessible to Javascript running on the pages with the same origin. Any XSS vulnerabilities present in the site, poses significant risk. There is also no equivalent attribute like <code>HTTPOnly</code> which can be used. Thus storing any critical data is not recommended.  </li>
+<li>All data in Local Storage and Session Storage is not encrypted by default and stored in plain text. Encrypting client side storage is a difficult problem to solve and not straight forward.</li>
+</ul>
+<h3 id="key-difference-between-cookies-localsession-storage-in-terms-of-security">Key Difference between Cookies &amp; local/session Storage in terms of Security</h3>
+<ul>
+<li>Cookies are sent with every request but local/session Storage  which decreases the attack surface.</li>
+<li>Javascript running on pages within the same origin can access data stored in local/session Storage, while we can deny access to cookies by using attributes like <code>HTTPOnly</code>.</li>
+<li>There are no built-in attributes for security configuration for local/session Storage but access to cookies can be configured using built-in attributes.</li>
+</ul>
+<h3 id="conclusion">Conclusion</h3>
+<ul>
+<li>The difference between localStorage and cookies is mostly about what is being stored and intended use cases,<ul>
+<li>Cookies are better for session management and authentication, Security-sensitive information (when properly configured), and data that needs to be sent to the server in each request for Server-side processing.</li>
+<li>localStorage is better for client-side data, UI preferences, Cached data, and Non-sensitive information.</li>
+</ul>
+</li>
+</ul>
+<p>Cookies should be used for session management and authentication because of their flexible security controls. It is also vital to have proper restrictions in place for access to cookies with available security attributes instead of relying on localStorage, which doesn't support these built-in protections.</p>
+</article>
+<footer>
+  &copy; 2026 seku &middot; <a href="../feed.xml">rss</a>
+</footer>
+</main>
+<script>
+function toggleTheme(){
+  var r=document.documentElement;
+  var cur=r.getAttribute('data-theme');
+  var sys=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  var next=cur?(cur==='dark'?'light':'dark'):(sys==='dark'?'light':'dark');
+  r.setAttribute('data-theme',next);
+  localStorage.setItem('theme',next);
+}
+</script>
+</body>
+</html>

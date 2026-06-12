@@ -1,34 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url>
-<loc>https://sureshpantha.com.np/posts/Threat-Modeling-Browser-s-Storage/</loc>
-<lastmod>2025-05-29T11:46:58+05:45</lastmod>
-</url>
-<url>
-<loc>https://sureshpantha.com.np/categories/</loc>
-<lastmod>2025-05-29T14:17:19+05:45</lastmod>
-</url>
-<url>
-<loc>https://sureshpantha.com.np/tags/</loc>
-<lastmod>2025-05-29T14:17:19+05:45</lastmod>
-</url>
-<url>
-<loc>https://sureshpantha.com.np/archives/</loc>
-<lastmod>2025-05-29T14:17:19+05:45</lastmod>
-</url>
-<url>
-<loc>https://sureshpantha.com.np/</loc>
-</url>
-<url>
-<loc>https://sureshpantha.com.np/tags/threatmodeling/</loc>
-</url>
-<url>
-<loc>https://sureshpantha.com.np/tags/web/</loc>
-</url>
-<url>
-<loc>https://sureshpantha.com.np/categories/security/</loc>
-</url>
-<url>
-<loc>https://sureshpantha.com.np/categories/web/</loc>
-</url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://sureshpantha.com.np/index.html</loc></url>
+  <url><loc>https://sureshpantha.com.np/about.html</loc></url>
+  <url><loc>https://sureshpantha.com.np/tags/index.html</loc></url>
+  <url><loc>https://sureshpantha.com.np/posts/threat-modeling-browsers-storage.html</loc></url>
+  <url><loc>https://sureshpantha.com.np/tags/security.html</loc></url>
+  <url><loc>https://sureshpantha.com.np/tags/browser.html</loc></url>
+  <url><loc>https://sureshpantha.com.np/tags/web.html</loc></url>
 </urlset>
