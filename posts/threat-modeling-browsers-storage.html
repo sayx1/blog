@@ -255,7 +255,7 @@ footer {
 <div class="post-header">
   <h1>Threat Modeling Browser’s Storage</h1>
   <div class="post-meta">
-    <span>Jun 12, 2026 &middot; seku &middot; 13 min read</span>
+    <span>Jun 12, 2026 &middot; seku &middot; 14 min read</span>
     <div class="tags"><a class="tag" href="../tags/security.html">#security</a><a class="tag" href="../tags/browser.html">#browser</a><a class="tag" href="../tags/web.html">#web</a></div>
   </div>
 </div>
@@ -299,10 +299,10 @@ footer {
 <h2 id="introduction">Introduction</h2>
 <p>In the early days of the World Wide Web, websites were primarily static. The server responded with the same static file (say <code>home.html</code> for the home page) without any user-specific personalization on every request. Every visitor to any web application receives identical content from the server. As web applications evolved, the need to have personalized content tailored to each user became a necessity. Websites needed to store data and generate customized content in real time based on user interaction, specific requests, and/or backend processes. This required the servers to store user information and verify the user's identity when serving the requests. As HTTP is a stateless protocol, web applications require a way to store user-identifying information on the client side, which could be sent with every request. <a href="https://hiddenheroes.netguru.com/lou-montulli">Thus, the cookie was born</a>. </p>
 <p>The predominant architecture that emerged from all this involves server-side storage of user data, with browsers maintaining session information to identify logged-in users and facilitate personalized content delivery. </p>
-<p><figure><img alt="Pa" src="../img/pa.png" /><figcaption>Pa</figcaption></figure></p>
+<p><figure><img alt="Classic architecture: user data lives on the server, the browser keeps only session information" src="../img/pa.png" /><figcaption>Classic architecture: user data lives on the server, the browser keeps only session information</figcaption></figure></p>
 <p>Web applications have become integral to our lives as the internet has grown. Everything is moving to the web, and web applications are becoming sophisticated and feature-rich. The data the server needs to send on each request is growing exponentially. If data is only stored on the server and transmitted on each request, the load times for each website would be very high. Storing some of the information from previous requests on the client end significantly increases the response times, removes the burden on the server to serve huge amounts of data in each request, and allows the javascript running on the browser to give unique user experiences. 
 Today, web applications store significant information on the client side in the browsers.</p>
-<p><figure><img alt="Pa user" src="../img/pa_user.png" /><figcaption>Pa user</figcaption></figure>
+<p><figure><img alt="Modern architecture: significant user data is also stored on the client side" src="../img/pa_user.png" /><figcaption>Modern architecture: significant user data is also stored on the client side</figcaption></figure>
 As more websites are being built to store significant data on the client side, it is becoming a prime target for attackers. As there are multiple ways of storing this data on the browser, each coming with its own advantages and disadvantages, it becomes essential for development teams to learn about the risks associated with each form of storage and ensure safeguards are in place to address the issue.</p>
 <h2 id="access-to-client-side-storage">Access to Client-Side Storage</h2>
 <p>Like any other program in your operating system, browsers run as a process. When it's running, this process gets its own set of memory. In multithreaded systems, this process can spawn o
@@ -365,10 +365,10 @@ processes, which are child-to-parent processes. In most modern browsers, a site 
     - <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage"><strong>Session Storage</strong></a></p>
 <h3 id="cookies">Cookies</h3>
 <p>HTTP cookies are data stored in the client’s device, which enables websites to track sessions, remember user preferences, and personalize web experiences. A cookie is transmitted through the <code>Cookie</code> Header after being set by the server using the <code>Set-Cookie</code> response header. </p>
-<p><figure><img alt="Cookie" src="../img/cookie.png" /><figcaption>Cookie</figcaption></figure></p>
+<p><figure><img alt="The server sets a cookie with the Set-Cookie response header" src="../img/cookie.png" /><figcaption>The server sets a cookie with the Set-Cookie response header</figcaption></figure></p>
 <p>Along with the key-value pair, the server can set an expiry date after which the cookie expires. If no date is set, session cookies (without an expiration date) expire when the browser is closed. Persistent cookies without an explicit expiry date typically default to not being set, which means they won't be automatically stored or transmitted after the current browsing session ends.
 The cookies set for a site are sent to the server for every subsequent request. </p>
-<p><figure><img alt="Cookie send" src="../img/cookie-send.png" /><figcaption>Cookie send</figcaption></figure></p>
+<p><figure><img alt="The browser attaches stored cookies to every subsequent request to the site" src="../img/cookie-send.png" /><figcaption>The browser attaches stored cookies to every subsequent request to the site</figcaption></figure></p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
@@ -462,9 +462,9 @@ The cookies set for a site are sent to the server for every subsequent request. 
 <p>Web storage API provides a mechanism to store key-value pairs in the browser. It is generally divided into Local Storage and Session Storage.</p>
 <h5 id="local-storage"><strong>Local Storage</strong></h5>
 <p>Local storage is a feature in web browsers that lets web developers save data in users' browsers. It is part of the Web Storage API along with Session Storage. When users request a webpage, the server sends data and the Javascript code to save in the browser — local Storage stores data as key-value pairs. Data saved through local storage persists on the browser when the page is closed or refreshed. Data in localStorage is saved using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage/setItem">localStorage.setItem()</a> method.
-<figure><img alt="Localset" src="../img/localset.png" /><figcaption>Localset</figcaption></figure>
+<figure><img alt="Saving data in the browser with localStorage.setItem()" src="../img/localset.png" /><figcaption>Saving data in the browser with localStorage.setItem()</figcaption></figure>
 The stored data can be retrieved by the javascript running on the browser with it's key by using the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage/getItem">localStorage.getItem("key")</a></p>
-<p><figure><img alt="Localget" src="../img/localget.png" /><figcaption>Localget</figcaption></figure>Once stored in Local Storage, data must be cleared explicitly ( using methods like <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage/removeItem">removeItem()</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage/clear">clear()</a> ); i.e., it remains unless explicitly cleared. Data stored in Local Storage is scoped to the document's origin.</p>
+<p><figure><img alt="Reading stored data back with localStorage.getItem()" src="../img/localget.png" /><figcaption>Reading stored data back with localStorage.getItem()</figcaption></figure>Once stored in Local Storage, data must be cleared explicitly ( using methods like <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage/removeItem">removeItem()</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/API/Storage/clear">clear()</a> ); i.e., it remains unless explicitly cleared. Data stored in Local Storage is scoped to the document's origin.</p>
 <div class="table-wrap"><table>
 <thead>
 <tr>
